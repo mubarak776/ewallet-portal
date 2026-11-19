@@ -24,7 +24,7 @@
       min-height: 100vh;
       background: #080b12;
       position: relative;
-      padding-bottom: 88px;
+      padding-bottom: 90px;
     }
     .card-box {
       background: #121722;
@@ -50,7 +50,7 @@
   </style>
 </head>
 <body>
-    <!-- ==================== AUTH SCREEN ==================== -->
+  <!-- ==================== AUTH SCREEN ==================== -->
   <div id="authScreen" class="auth-bg flex items-center justify-center p-4">
     <div class="bg-white text-slate-900 w-full max-w-md rounded-3xl p-7 shadow-2xl">
       <div class="text-center mb-5">
@@ -137,7 +137,7 @@
         </a>
         <button onclick="openPage('profile')" id="headerAvatar"
           class="w-10 h-10 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center text-base">
-          U
+          M
         </button>
       </div>
     </header>
@@ -177,8 +177,8 @@
       <button onclick="logoutUser()" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 text-sm font-semibold text-left">
         <i class="fas fa-sign-out-alt w-5"></i> Logout
       </button>
-    </aside>
-        <!-- ==================== 1. HOME PAGE ==================== -->
+              </aside>
+                  <!-- ==================== 1. HOME PAGE ==================== -->
     <section id="page-home" class="page-view hidden p-4 space-y-4">
       <div class="balance-box p-5 shadow-xl">
         <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">TOTAL WITHDRAWABLE BALANCE</p>
@@ -220,7 +220,7 @@
           <span class="text-[11px] text-slate-300">Users</span>
         </button>
 
-        <button onclick="toast('1X Partner Portal Ready')" class="flex flex-col items-center gap-1.5">
+        <button onclick="toast('1X Partner Portal Connected')" class="flex flex-col items-center gap-1.5">
           <div class="w-12 h-12 rounded-2xl bg-sky-600/20 border border-sky-500/30 text-sky-400 flex items-center justify-center font-black text-xs">
             1X
           </div>
@@ -262,8 +262,8 @@
         </div>
         <div id="homeTxList" class="space-y-3"></div>
       </div>
-    </section>
-        <!-- ==================== 2. DEPOSIT PAGE ==================== -->
+          </section>
+              <!-- ==================== 2. DEPOSIT PAGE ==================== -->
     <section id="page-deposit" class="page-view hidden p-4 space-y-4">
       <div class="flex items-center gap-3">
         <button onclick="openPage('home')" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs text-cyan-400 font-semibold">← ব্যাক</button>
@@ -371,8 +371,8 @@
           Withdraw Now
         </button>
       </div>
-          </section>
-      <!-- ==================== 4. SECURE AGENT PANEL ==================== -->
+    </section>
+        <!-- ==================== 4. SECURE AGENT PANEL ==================== -->
     <section id="page-gateway" class="page-view hidden p-4 space-y-4">
       <button onclick="openPage('home')" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs text-cyan-400 font-semibold">← Dashboard</button>
 
@@ -454,6 +454,31 @@
         </div>
       </div>
 
+      <!-- Quick Manual Deposit / Withdraw Queue Entry -->
+      <div class="card-box p-4 space-y-3">
+        <p class="text-xs font-extrabold text-cyan-400 uppercase">দ্রুত ডিপোজিট / উত্তোলন সাবমিট</p>
+        <div class="grid grid-cols-2 gap-2">
+          <select id="quickQueueKind" class="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-white">
+            <option value="DEPOSIT">Deposit Request</option>
+            <option value="WITHDRAW">Withdraw Request</option>
+          </select>
+          <select id="quickQueueMethod" class="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-white">
+            <option value="bKash">বিকাশ</option>
+            <option value="Nagad">নগদ</option>
+            <option value="Binance">বাইনান্স</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <input id="quickQueueAmt" type="number" placeholder="পরিমাণ (৳)"
+            class="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+          <input id="quickQueueRef" type="text" placeholder="TrxID / Account" autocomplete="off"
+            class="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+        </div>
+        <button type="button" onclick="addQueueEntry()" class="w-full py-2.5 rounded-xl cyan-grad font-bold text-xs">
+          + সাবমিট রিকোয়েস্ট যুক্ত করুন
+        </button>
+      </div>
+
       <div class="card-box p-4 space-y-3">
         <p class="text-xs font-extrabold text-cyan-400 uppercase">INCOMING DEPOSIT & WITHDRAWAL REQUESTS</p>
         <div id="incomingRequestsList" class="space-y-3"></div>
@@ -468,9 +493,139 @@
         <p class="text-xs font-extrabold text-cyan-400 uppercase">AUTO TRANSACTIONS HISTORY</p>
         <div id="autoHistoryList" class="text-xs text-slate-400"></div>
       </div>
-             <!-- ==================== 5. TRANSACTIONS PAGE ==================== -->
-    <section id="page-transactions" class="page-view hidden p-4 space-y-4">
+  </section>
+                <!-- ==================== 4. SECURE AGENT PANEL ==================== -->
+    <section id="page-gateway" class="page-view hidden p-4 space-y-4">
       <button onclick="openPage('home')" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs text-cyan-400 font-semibold">← Dashboard</button>
+
+      <h2 class="text-lg font-extrabold text-cyan-400 flex items-center gap-2">
+        <i class="fas fa-shield-alt"></i> Secure Agent Panel
+      </h2>
+
+      <div class="card-box p-4 space-y-2 text-xs">
+        <p class="font-extrabold text-cyan-400 uppercase">পেমেন্ট ও সাপোর্ট তথ্য</p>
+        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl">
+          <span class="text-pink-400 font-bold">বিকাশ সেন্ড মানি:</span>
+          <button type="button" onclick="copyText('01873046713')" class="text-white font-extrabold">01873046713 <i class="far fa-copy text-cyan-400 ml-1"></i></button>
+        </div>
+        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl">
+          <span class="text-orange-400 font-bold">নগদ সেন্ড মানি:</span>
+          <button type="button" onclick="copyText('01863796311')" class="text-white font-extrabold">01863796311 <i class="far fa-copy text-cyan-400 ml-1"></i></button>
+        </div>
+        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl">
+          <span class="text-yellow-400 font-bold">বাইনান্স ID:</span>
+          <button type="button" onclick="copyText('1268820382')" class="text-white font-extrabold">1268820382 <i class="far fa-copy text-cyan-400 ml-1"></i></button>
+        </div>
+        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl">
+          <span class="text-sky-400 font-bold">টেলিগ্রাম সাপোর্ট:</span>
+          <a href="https://t.me/E_WALLET_Support_Team" target="_blank" rel="noopener noreferrer" class="text-cyan-300 font-extrabold">@E_WALLET_Support_Team</a>
+        </div>
+      </div>
+
+      <div class="card-box p-4 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-bold text-white">Auto Request Status</p>
+          <p id="autoStatusText" class="text-xs text-emerald-400 mt-0.5">● Active (সক্রিয় আছে)</p>
+        </div>
+        <input id="autoRequestToggle" type="checkbox" checked onchange="toggleAutoStatus()" class="w-6 h-6 accent-cyan-400 cursor-pointer" />
+      </div>
+
+      <div class="balance-box p-5 text-center">
+        <p class="text-xs text-slate-400">Available Main Balance</p>
+        <h3 id="agentMainBal" class="text-3xl font-extrabold text-white mt-1">৳0.00</h3>
+        <p id="agentCommBal" class="text-xs text-emerald-400 font-semibold mt-1">Agent Commission (20%): ৳0.00</p>
+        <p class="text-[11px] text-amber-400 mt-2">* Safety Reserve: Min 100 TK balance must remain in account</p>
+      </div>
+
+      <div class="card-box p-4 space-y-3">
+        <p class="text-xs font-extrabold text-cyan-400 uppercase">অ্যাকাউন্ট যুক্ত করুন (PAYMENT ACCOUNTS)</p>
+
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" onclick="openGatewayForm('বিকাশ')" class="p-3 rounded-xl bg-slate-900 border border-slate-700 text-center">
+            <p class="font-extrabold text-pink-500 text-xs">বিকাশ</p>
+            <p class="text-[10px] text-slate-400 mt-1">অ্যাকাউন্ট এড +</p>
+          </button>
+          <button type="button" onclick="openGatewayForm('নগদ')" class="p-3 rounded-xl bg-slate-900 border border-slate-700 text-center">
+            <p class="font-extrabold text-orange-500 text-xs">নগদ</p>
+            <p class="text-[10px] text-slate-400 mt-1">অ্যাকাউন্ট এড +</p>
+          </button>
+          <button type="button" onclick="openGatewayForm('বাইনান্স')" class="p-3 rounded-xl bg-slate-900 border border-slate-700 text-center">
+            <p class="font-extrabold text-yellow-400 text-xs">বাইনান্স</p>
+            <p class="text-[10px] text-slate-400 mt-1">অ্যাকাউন্ট এড +</p>
+          </button>
+        </div>
+
+        <div id="gatewayFormBox" class="hidden bg-slate-900 border border-cyan-500/40 rounded-xl p-4 space-y-3 mt-2">
+          <h4 class="text-sm font-bold text-cyan-400">Add <span id="gwFormName">বিকাশ</span> Account</h4>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">অ্যাকাউন্টের ধরন:</label>
+            <select id="gwType" class="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-sm text-white">
+              <option value="Personal">Personal</option>
+              <option value="Agent">Agent</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">নম্বর / ওয়ালেট আইডি:</label>
+            <input id="gwNumber" type="text" placeholder="নম্বর বা ওয়ালেট আইডি দিন" autocomplete="off"
+              class="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-sm text-white" />
+          </div>
+          <div class="flex gap-2">
+            <button type="button" onclick="saveGatewayAccount()" class="w-1/2 py-2.5 rounded-lg cyan-grad font-bold text-xs">Save Account</button>
+            <button type="button" onclick="document.getElementById('gatewayFormBox').classList.add('hidden')" class="w-1/2 py-2.5 rounded-lg bg-slate-700 text-xs font-semibold">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Manual Deposit / Withdraw Queue Entry -->
+      <div class="card-box p-4 space-y-3">
+        <p class="text-xs font-extrabold text-cyan-400 uppercase">দ্রুত ডিপোজিট / উত্তোলন সাবমিট</p>
+        <div class="grid grid-cols-2 gap-2">
+          <select id="quickQueueKind" class="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-white">
+            <option value="DEPOSIT">Deposit Request</option>
+            <option value="WITHDRAW">Withdraw Request</option>
+          </select>
+          <select id="quickQueueMethod" class="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-white">
+            <option value="bKash">বিকাশ</option>
+            <option value="Nagad">নগদ</option>
+            <option value="Binance">বাইনান্স</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <input id="quickQueueAmt" type="number" placeholder="পরিমাণ (৳)"
+            class="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+          <input id="quickQueueRef" type="text" placeholder="TrxID / Account" autocomplete="off"
+            class="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+        </div>
+        <button type="button" onclick="addQueueEntry()" class="w-full py-2.5 rounded-xl cyan-grad font-bold text-xs">
+          + সাবমিট রিকোয়েস্ট যুক্ত করুন
+        </button>
+      </div>
+
+      <div class="card-box p-4 space-y-3">
+        <p class="text-xs font-extrabold text-cyan-400 uppercase">INCOMING DEPOSIT & WITHDRAWAL REQUESTS</p>
+        <div id="incomingRequestsList" class="space-y-3"></div>
+      </div>
+
+      <div class="card-box p-4 space-y-3">
+        <p class="text-xs font-extrabold text-cyan-400">আপনার সেট করা অ্যাকাউন্টসমূহ</p>
+        <div id="savedGatewaysList" class="space-y-2.5"></div>
+      </div>
+
+      <div class="card-box p-4 space-y-2">
+        <p class="text-xs font-extrabold text-cyan-400 uppercase">AUTO TRANSACTIONS HISTORY</p>
+        <div id="autoHistoryList" class="text-xs text-slate-400"></div>
+      </div>
+  </section>
+                <!-- ==================== 5. TRANSACTIONS PAGE ==================== -->
+    <section id="page-transactions" class="page-view hidden p-4 space-y-4">
+      <div class="flex items-center justify-between">
+        <button onclick="openPage('home')" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs text-cyan-400 font-semibold">← Dashboard</button>
+        <div class="flex gap-1.5">
+          <button onclick="setTxFilter('ALL')" id="flt-ALL" class="px-2.5 py-1 rounded-lg bg-cyan-400 text-slate-950 text-[11px] font-bold">All</button>
+          <button onclick="setTxFilter('DEPOSIT')" id="flt-DEPOSIT" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[11px] font-bold">Deposit</button>
+          <button onclick="setTxFilter('WITHDRAW')" id="flt-WITHDRAW" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[11px] font-bold">Withdraw</button>
+        </div>
+      </div>
       <div class="card-box p-4 space-y-3">
         <h2 class="text-base font-bold text-white">Wallet Transactions</h2>
         <div id="allTxList" class="space-y-3"></div>
@@ -498,17 +653,17 @@
         <div class="grid grid-cols-2 gap-3">
           <div class="bg-slate-900 p-3.5 rounded-xl">
             <p class="text-xs text-slate-400">Total Accounts</p>
-            <p class="text-lg font-extrabold text-cyan-400 mt-1">0 জন</p>
+            <p class="text-lg font-extrabold text-cyan-400 mt-1">1 জন</p>
           </div>
           <div class="bg-slate-900 p-3.5 rounded-xl">
             <p class="text-xs text-slate-400">Total Deposit</p>
-            <p class="text-lg font-extrabold text-emerald-400 mt-1">৳0.00</p>
+            <p id="vipTotalDeposit" class="text-lg font-extrabold text-emerald-400 mt-1">৳0.00</p>
           </div>
         </div>
         <div class="bg-slate-900 p-4 rounded-xl space-y-1.5 text-xs">
           <p class="font-bold text-amber-400 mb-1">💰 Referral Commission (30%)</p>
-          <div class="flex justify-between"><span>Deposit Commission (30%):</span><span class="text-emerald-400 font-bold">৳0.00</span></div>
-          <div class="flex justify-between"><span>Withdraw Commission (30%):</span><span class="text-emerald-400 font-bold">৳0.00</span></div>
+          <div class="flex justify-between"><span>Deposit Commission (30%):</span><span id="vipDepComm" class="text-emerald-400 font-bold">৳0.00</span></div>
+          <div class="flex justify-between"><span>Withdraw Commission (30%):</span><span id="vipWithComm" class="text-emerald-400 font-bold">৳0.00</span></div>
         </div>
       </div>
     </section>
@@ -560,7 +715,7 @@
         <h2 class="text-lg font-bold text-cyan-400">👤 My Profile</h2>
 
         <div class="bg-slate-900 p-4 rounded-2xl flex items-center gap-4">
-          <div id="profAvatar" class="w-14 h-14 rounded-full bg-cyan-400 text-slate-950 font-extrabold text-2xl flex items-center justify-center">U</div>
+          <div id="profAvatar" class="w-14 h-14 rounded-full bg-cyan-400 text-slate-950 font-extrabold text-2xl flex items-center justify-center">M</div>
           <div>
             <h3 id="profDisplayName" class="font-bold text-base text-white">Wallet User</h3>
             <p id="profDisplayId" class="text-xs text-slate-400">ID: -</p>
@@ -594,9 +749,8 @@
         <h3 class="text-sm font-bold text-cyan-400">📄 Saved Account Documents</h3>
         <div id="profileDocsSummary" class="bg-slate-900 rounded-xl p-3.5 space-y-1 text-slate-300"></div>
       </div>
-    </section>
-      </section>
-                <a href="https://t.me/E_WALLET_Support_Team" target="_blank" rel="noopener noreferrer"
+  </section>
+      <a href="https://t.me/E_WALLET_Support_Team" target="_blank" rel="noopener noreferrer"
       class="fixed bottom-20 right-4 w-12 h-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-xl flex items-center justify-center text-xl z-30"
       title="Telegram Support">
       <i class="far fa-comment-dots"></i>
@@ -630,8 +784,9 @@
 
   <div id="toastBox" class="hidden fixed top-16 left-1/2 -translate-x-1/2 bg-slate-900 border border-cyan-400/50 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-2xl z-50"></div>
     <script>
-    const VAULT_KEY = 'ewallet_pro_vault_v3';
-    const SESSION_USER_KEY = 'ewallet_pro_session_v3';
+    const VAULT_KEY = 'ewallet_pro_vault_v4';
+    const SESSION_KEY = 'ewallet_pro_session_v4';
+    const SHARED_QUEUE_KEY = 'ewallet_shared_queue_v4';
 
     const CHANNELS = {
       bKash: { label: 'বিকাশ সেন্ড মানি নাম্বার', value: '01873046713', title: 'বিকাশ' },
@@ -657,18 +812,20 @@
       };
     }
 
-    function readVault() {
-      try { return JSON.parse(localStorage.getItem(VAULT_KEY)) || {}; }
-      catch { return {}; }
+    function readJSON(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+      catch { return fallback; }
     }
 
-    function writeVault(data) {
-      localStorage.setItem(VAULT_KEY, JSON.stringify(data));
+    function writeJSON(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
     }
 
-    let vault = readVault();
-    let currentUserId = localStorage.getItem(SESSION_USER_KEY) || '';
+    let vault = readJSON(VAULT_KEY, {});
+    let sharedQueue = readJSON(SHARED_QUEUE_KEY, []);
+    let currentUserId = localStorage.getItem(SESSION_KEY) || '';
     let selectedMethod = 'bKash';
+    let txFilter = 'ALL';
 
     function getCurrentProfile() {
       if (!currentUserId || !vault[currentUserId]) return null;
@@ -677,7 +834,8 @@
 
     function commitChanges() {
       if (!currentUserId || !vault[currentUserId]) return;
-      writeVault(vault);
+      writeJSON(VAULT_KEY, vault);
+      writeJSON(SHARED_QUEUE_KEY, sharedQueue);
       renderAll();
     }
 
@@ -717,13 +875,13 @@
       const pass = document.getElementById('regPass').value.trim();
       if (!id || pass.length < 6) return toast('সঠিক আইডি এবং কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দিন!');
 
-      vault = readVault();
+      vault = readJSON(VAULT_KEY, {});
       if (vault[id]) return toast('এই ইউজার আইডি দিয়ে ইতিমধ্যে অ্যাকাউন্ট আছে! Login করুন।');
 
       vault[id] = createProfile(id, name, pass);
       currentUserId = id;
-      localStorage.setItem(SESSION_USER_KEY, id);
-      writeVault(vault);
+      localStorage.setItem(SESSION_KEY, id);
+      writeJSON(VAULT_KEY, vault);
       e.target.reset();
       showApp();
       toast('অ্যাকাউন্ট তৈরি হয়েছে! ব্যালেন্স ও তথ্য সেভ থাকবে।');
@@ -734,12 +892,12 @@
       const id = document.getElementById('loginUserId').value.trim();
       const pass = document.getElementById('loginPass').value.trim();
 
-      vault = readVault();
+      vault = readJSON(VAULT_KEY, {});
       const found = vault[id];
       if (!found || found.pass !== pass) return toast('ইউজার আইডি অথবা পাসওয়ার্ড সঠিক নয়!');
 
       currentUserId = id;
-      localStorage.setItem(SESSION_USER_KEY, id);
+      localStorage.setItem(SESSION_KEY, id);
       e.target.reset();
       showApp();
       toast('অ্যাকাউন্টের সকল তথ্য ও ব্যালেন্স লোড হয়েছে।');
@@ -747,7 +905,7 @@
 
     function logoutUser() {
       currentUserId = '';
-      localStorage.removeItem(SESSION_USER_KEY);
+      localStorage.removeItem(SESSION_KEY);
       document.getElementById('appScreen').classList.add('hidden');
       document.getElementById('authScreen').classList.remove('hidden');
       setAuthMode('login');
@@ -809,25 +967,36 @@
       document.getElementById('depStep1').classList.remove('hidden');
     }
 
-    function submitDepRequest() {
+    function pushRequestToQueue(kind, method, amount, title, refText) {
       const u = getCurrentProfile();
-      if (!u) return;
+      const nowStr = new Date().toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const item = {
+        id: Date.now() + Math.floor(Math.random() * 999),
+        fromUser: u ? u.id : 'Guest',
+        kind,
+        method,
+        amount: Number(amount),
+        ref: refText || '',
+        status: 'Pending',
+        title,
+        time: nowStr
+      };
+      sharedQueue.unshift(item);
+      if (u) {
+        u.transactions.unshift({ ...item });
+      }
+      commitChanges();
+      return item;
+    }
+
+    function submitDepRequest() {
       const amt = parseFloat(document.getElementById('depAmount').value);
       const trx = document.getElementById('depTrx').value.trim().toUpperCase();
+      if (!amt || amt < 1000 || amt > 25000) return toast('১,০০০ থেকে ২৫,০০০ টাকার মধ্যে পরিমাণ দিন!');
       if (!trx) return toast('ট্রানজেকশন আইডি (TrxID) দিন!');
 
       const ch = CHANNELS[selectedMethod] || CHANNELS.bKash;
-      u.transactions.unshift({
-        id: Date.now(),
-        kind: 'DEPOSIT',
-        method: selectedMethod,
-        amount: amt,
-        trxId: trx,
-        status: 'Pending',
-        title: `Deposit via ${ch.title} (TrxID: ${trx})`,
-        time: new Date().toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-      });
-      commitChanges();
+      pushRequestToQueue('DEPOSIT', selectedMethod, amt, `Deposit via ${ch.title} (TrxID: ${trx})`, trx);
 
       const modal = document.getElementById('processingModal');
       const numEl = document.getElementById('countdownNum');
@@ -842,7 +1011,7 @@
           modal.classList.add('hidden');
           document.getElementById('depTrx').value = '';
           openPage('home');
-          toast('ডিপোজিট রিকোয়েস্ট যুক্ত হয়েছে! Gateway থেকে Approve করুন।');
+          toast('ডিপোজিট সাবমিট হয়েছে! Gateway থেকে Approve করলে ব্যালেন্সে যোগ হবে।');
         } else {
           numEl.textContent = sec;
         }
@@ -850,8 +1019,6 @@
     }
 
     function submitWithdrawRequest() {
-      const u = getCurrentProfile();
-      if (!u) return;
       const method = document.getElementById('withMethod').value;
       const acc = document.getElementById('withAccount').value.trim();
       const amt = parseFloat(document.getElementById('withAmount').value);
@@ -859,22 +1026,28 @@
       if (!acc) return toast('Account Number / Pay ID দিন!');
       if (!amt || amt < 5000) return toast('সর্বনিম্ন উত্তোলনের পরিমাণ ৫,০০০ টাকা!');
 
-      u.transactions.unshift({
-        id: Date.now(),
-        kind: 'WITHDRAW',
-        method,
-        amount: amt,
-        account: acc,
-        status: 'Pending',
-        title: `Withdrawal Request via ${method}`,
-        time: new Date().toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-      });
-
+      pushRequestToQueue('WITHDRAW', method, amt, `Withdrawal Request via ${method} (${acc})`, acc);
       document.getElementById('withAccount').value = '';
       document.getElementById('withAmount').value = '';
-      commitChanges();
-      openPage('home');
-      toast('উইথড্র রিকোয়েস্ট সাবমিট হয়েছে!');
+      openPage('gateway');
+      toast('উত্তোলন রিকোয়েস্ট সাবমিট হয়েছে! নিচ থেকে Confirm & Approve করুন।');
+    }
+
+    function addQueueEntry() {
+      const kind = document.getElementById('quickQueueKind').value;
+      const method = document.getElementById('quickQueueMethod').value;
+      const amt = parseFloat(document.getElementById('quickQueueAmt').value);
+      const ref = document.getElementById('quickQueueRef').value.trim();
+      if (!amt || amt <= 0) return toast('সঠিক পরিমাণ দিন!');
+
+      const title = kind === 'DEPOSIT'
+        ? `Deposit via ${method}${ref ? ' (TrxID: ' + ref + ')' : ''}`
+        : `Withdrawal Request via ${method}${ref ? ' (' + ref + ')' : ''}`;
+
+      pushRequestToQueue(kind, method, amt, title, ref);
+      document.getElementById('quickQueueAmt').value = '';
+      document.getElementById('quickQueueRef').value = '';
+      toast('রিকোয়েস্ট যুক্ত হয়েছে!');
     }
           function toggleAutoStatus() {
       const u = getCurrentProfile();
@@ -918,29 +1091,50 @@
       commitChanges();
     }
 
-    function approveTx(id) {
+    function approveQueueItem(id) {
       const u = getCurrentProfile();
       if (!u) return;
-      const tx = u.transactions.find(t => t.id === id);
-      if (!tx || tx.status !== 'Pending') return;
+      const qItem = sharedQueue.find(q => q.id === id);
+      if (!qItem || qItem.status !== 'Pending') return;
 
-      const comm = tx.amount * 0.20;
-      tx.status = 'Approved';
+      const comm = qItem.amount * 0.20;
+      qItem.status = 'Approved';
       u.commissionBalance += comm;
       u.todayCommission += comm;
 
-      if (tx.kind === 'DEPOSIT') {
-        u.mainBalance += tx.amount;
-        u.totalDeposit += tx.amount;
-        tx.title = `${tx.title} [Deposit Verified & Approved]`;
+      if (qItem.kind === 'DEPOSIT') {
+        u.mainBalance += qItem.amount;
+        u.totalDeposit += qItem.amount;
+        qItem.title = `${qItem.title} [Deposit Verified & Approved]`;
       } else {
-        u.mainBalance -= tx.amount;
-        u.totalWithdraw += tx.amount;
-        tx.title = `${tx.title} [Withdrawal Paid & Approved]`;
+        u.mainBalance -= qItem.amount;
+        u.totalWithdraw += qItem.amount;
+        qItem.title = `${qItem.title} [Withdrawal Paid & Approved]`;
+      }
+
+      const existingUserTx = u.transactions.find(t => t.id === id);
+      if (existingUserTx) {
+        existingUserTx.status = 'Approved';
+        existingUserTx.title = qItem.title;
+      } else {
+        u.transactions.unshift({ ...qItem });
       }
 
       commitChanges();
-      toast(`Approved! ২০% কমিশন ৳${fmt(comm)} যোগ হয়েছে।`);
+      toast(`সাবমিট ও অ্যাপ্রুভ সম্পন্ন! ২০% কমিশন ৳${fmt(comm)} যুক্ত হয়েছে।`);
+    }
+
+    function setTxFilter(mode) {
+      txFilter = mode;
+      ['ALL', 'DEPOSIT', 'WITHDRAW'].forEach(m => {
+        const btn = document.getElementById('flt-' + m);
+        if (!btn) return;
+        const active = m === mode;
+        btn.className = active
+          ? 'px-2.5 py-1 rounded-lg bg-cyan-400 text-slate-950 text-[11px] font-bold'
+          : 'px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[11px] font-bold';
+      });
+      renderAll();
     }
 
     function submitKycDemo(e) {
@@ -981,7 +1175,7 @@
       const u = getCurrentProfile();
       if (!u) return;
 
-      const initial = (u.name || 'U').charAt(0).toUpperCase();
+      const initial = (u.name || 'M').charAt(0).toUpperCase();
       const withdrawable = u.mainBalance + u.commissionBalance;
 
       document.getElementById('headerAvatar').textContent = initial;
@@ -998,6 +1192,10 @@
 
       document.getElementById('agentMainBal').textContent = '৳' + fmt(u.mainBalance);
       document.getElementById('agentCommBal').textContent = `Agent Commission (20%): ৳${fmt(u.commissionBalance)}`;
+
+      document.getElementById('vipTotalDeposit').textContent = '৳' + fmt(u.totalDeposit);
+      document.getElementById('vipDepComm').textContent = '৳' + fmt(u.totalDeposit * 0.30);
+      document.getElementById('vipWithComm').textContent = '৳' + fmt(u.totalWithdraw * 0.30);
 
       const autoEl = document.getElementById('autoRequestToggle');
       autoEl.checked = u.autoStatus;
@@ -1035,20 +1233,23 @@
 
       const emptyBox = '<p class="text-center text-xs text-slate-500 py-5">কোনো লেনদেন পাওয়া যায়নি।</p>';
       document.getElementById('homeTxList').innerHTML = u.transactions.length ? u.transactions.slice(0, 5).map(txRow).join('') : emptyBox;
-      document.getElementById('allTxList').innerHTML = u.transactions.length ? u.transactions.map(txRow).join('') : emptyBox;
 
-      const pending = u.transactions.filter(t => t.status === 'Pending');
-      document.getElementById('incomingRequestsList').innerHTML = pending.length
-        ? pending.map(p => `
+      const filteredTx = txFilter === 'ALL' ? u.transactions : u.transactions.filter(t => t.kind === txFilter);
+      document.getElementById('allTxList').innerHTML = filteredTx.length ? filteredTx.map(txRow).join('') : emptyBox;
+
+      const pendingQueue = sharedQueue.filter(q => q.status === 'Pending');
+      document.getElementById('incomingRequestsList').innerHTML = pendingQueue.length
+        ? pendingQueue.map(p => `
           <div class="bg-slate-900 border border-slate-700 rounded-xl p-3.5 space-y-2">
             <div class="flex items-center justify-between">
               <span class="text-xs font-extrabold ${p.kind === 'DEPOSIT' ? 'text-emerald-400' : 'text-rose-400'}">Type: ${p.kind} | ${p.method.toUpperCase()}</span>
               <span class="text-sm font-extrabold text-cyan-400">Amount: ৳${fmt(p.amount)}</span>
             </div>
             <p class="text-xs text-slate-300">Description: ${p.title}</p>
+            <p class="text-[11px] text-slate-400">Submitted by: ${p.fromUser || 'User'}</p>
             <div class="flex items-center justify-between pt-1">
               <span class="text-xs text-amber-400 font-semibold">Status: Pending</span>
-              <button type="button" onclick="approveTx(${p.id})" class="px-3.5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs">
+              <button type="button" onclick="approveQueueItem(${p.id})" class="px-3.5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs">
                 ✓ Confirm & Approve
               </button>
             </div>
@@ -1073,9 +1274,9 @@
           </div>`).join('')
         : '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center text-xs text-slate-400">কোনো অ্যাকাউন্ট বা নম্বর সেভ করা নেই।</div>';
 
-      const approved = u.transactions.filter(t => t.status === 'Approved');
-      document.getElementById('autoHistoryList').innerHTML = approved.length
-        ? approved.map(a => `<div class="py-2 border-b border-slate-800/70 last:border-none flex justify-between"><span>${a.method} (${a.kind})</span><span class="text-emerald-400 font-bold">৳${fmt(a.amount)}</span></div>`).join('')
+      const approvedQueue = sharedQueue.filter(q => q.status === 'Approved');
+      document.getElementById('autoHistoryList').innerHTML = approvedQueue.length
+        ? approvedQueue.map(a => `<div class="py-2 border-b border-slate-800/70 last:border-none flex justify-between"><span>${a.method} (${a.kind})</span><span class="text-emerald-400 font-bold">৳${fmt(a.amount)}</span></div>`).join('')
         : '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center text-xs text-slate-400">কোনো অটো ট্রানজেকশন হিস্ট্রি নেই।</div>';
     }
 
