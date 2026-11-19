@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-WALLET — Agent & Wallet Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #070a10;
+      color: #f8fafc;
+    }
+    .auth-bg {
+      background: linear-gradient(145deg, #6d63f5 0%, #584cf0 55%, #473be0 100%);
+      min-height: 100vh;
+    }
+    .app-shell {
+      max-width: 440px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: #080b12;
+      position: relative;
+      padding-bottom: 88px;
+    }
+    .card-box {
+      background: #121722;
+      border: 1px solid #1f2738;
+      border-radius: 18px;
+    }
+    .balance-box {
+      background: linear-gradient(135deg, #171f2e 0%, #0d121c 100%);
+      border: 1px solid #263248;
+      border-radius: 20px;
+    }
+    .cyan-grad {
+      background: linear-gradient(90deg, #06b6d4 0%, #22d3ee 100%);
+      color: #041018;
+    }
+    @keyframes spinRing {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .ring-spin {
+      animation: spinRing 1.4s linear infinite;
+    }
+  </style>
+</head>
+<body>
+    <!-- ==================== AUTH SCREEN ==================== -->
+  <div id="authScreen" class="auth-bg flex items-center justify-center p-4">
+    <div class="bg-white text-slate-900 w-full max-w-md rounded-3xl p-7 shadow-2xl">
+      <div class="text-center mb-5">
+        <h1 id="authHeading" class="text-3xl font-extrabold text-indigo-600">Register</h1>
+        <p id="authSubHeading" class="text-slate-500 text-sm mt-1">নতুন অ্যাকাউন্ট তৈরি করুন</p>
+      </div>
+
+      <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-3.5" autocomplete="off">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
+          <input id="regName" type="text" required placeholder="আপনার নাম লিখুন" autocomplete="off"
+            class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-indigo-200 focus:outline-none focus:border-indigo-500 text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">User ID / Handle</label>
+          <input id="regUserId" type="text" required placeholder="একটি ইউনিক আইডি লিখুন" autocomplete="off"
+            class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-indigo-500 text-sm font-semibold" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Password (min 6)</label>
+          <input id="regPass" type="password" minlength="6" required placeholder="••••••••" autocomplete="new-password"
+            class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-indigo-500 text-sm" />
+        </div>
+
+        <button type="submit"
+          class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg transition">
+          Register
+        </button>
+      </form>
+
+      <form id="loginForm" onsubmit="handleLogin(event)" class="hidden space-y-3.5" autocomplete="off">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">User ID / Handle</label>
+          <input id="loginUserId" type="text" required placeholder="আপনার ইউজার আইডি লিখুন" autocomplete="off"
+            class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-indigo-200 focus:outline-none focus:border-indigo-500 text-sm font-semibold" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
+          <input id="loginPass" type="password" required placeholder="••••••••" autocomplete="current-password"
+            class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-indigo-200 focus:outline-none focus:border-indigo-500 text-sm" />
+        </div>
+
+        <button type="submit"
+          class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg transition">
+          Login
+        </button>
+      </form>
+
+      <div class="text-center mt-5 space-y-2">
+        <p id="switchToLoginWrap" class="text-xs text-slate-500">
+          Already have an account?
+          <button type="button" onclick="setAuthMode('login')" class="text-indigo-600 font-bold hover:underline">Login</button>
+        </p>
+        <p id="switchToRegWrap" class="hidden text-xs text-slate-500">
+          Don't have an account?
+          <button type="button" onclick="setAuthMode('register')" class="text-indigo-600 font-bold hover:underline">Register</button>
+        </p>
+        <a href="https://t.me/E_WALLET_Support_Team" target="_blank" rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 text-xs font-bold text-sky-600 hover:underline pt-1">
+          <i class="fab fa-telegram"></i> Telegram Support: @E_WALLET_Support_Team
+        </a>
+      </div>
+    </div>
+  </div>
+    <!-- ==================== MAIN APP SHELL ==================== -->
+  <div id="appScreen" class="app-shell hidden">
+
+    <header class="sticky top-0 z-30 bg-[#0c1019]/95 backdrop-blur border-b border-slate-800/80 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleDrawer(true)" class="w-10 h-10 rounded-xl bg-slate-800/80 flex items-center justify-center text-slate-200">
+          <i class="fas fa-bars"></i>
+        </button>
+        <span class="text-xl font-extrabold tracking-widest text-cyan-400">E-WALLET</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="https://t.me/E_WALLET_Support_Team" target="_blank" rel="noopener noreferrer"
+          class="w-10 h-10 rounded-full bg-slate-800/80 flex items-center justify-center text-sky-400 relative" title="Telegram Support">
+          <i class="fab fa-telegram-plane text-lg"></i>
+          <span class="w-2 h-2 rounded-full bg-rose-500 absolute top-2 right-2"></span>
+        </a>
+        <button onclick="openPage('profile')" id="headerAvatar"
+          class="w-10 h-10 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center text-base">
+          U
+        </button>
+      </div>
+    </header>
+
+    <div id="drawerBackdrop" onclick="toggleDrawer(false)" class="hidden fixed inset-0 bg-black/70 z-40"></div>
+    <aside id="sideDrawer" class="fixed top-0 left-0 h-full w-64 bg-[#0d121c] border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 p-4 flex flex-col justify-between">
+      <div>
+        <div class="text-xl font-extrabold tracking-widest text-cyan-400 px-2 py-3 mb-2">E-WALLET</div>
+        <nav class="space-y-1 text-sm">
+          <button onclick="openPage('home'); toggleDrawer(false)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-slate-800/80 text-white font-semibold text-left">
+            <i class="fas fa-home text-amber-400 w-5"></i> Home
+          </button>
+          <button onclick="openPage('deposit'); toggleDrawer(false)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800/50 text-slate-300 text-left">
+            <i class="far fa-credit-card text-amber-400 w-5"></i> Add Balance
+          </button>
+          <button onclick="openPage('withdraw'); toggleDrawer(false)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800/50 text-slate-300 text-left">
+            <i class="fas fa-arrow-circle-down text-emerald-400 w-5"></i> Withdraw
+          </button>
+          <button onclick="openPage('transactions'); toggleDrawer(false)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800/50 text-slate-300 text-left">
+            <i class="fas fa-receipt text-purple-400 w-5"></i> Transactions
+          </button>
+          <button onclick="openPage('vip'); toggleDrawer(false)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800/50 text-slate-300 text-left">
+            <i class="fas fa-crown text-yellow-400 w-5"></i> VIP Tier
+          </button>
+          <button onclick="openPage('kyc'); toggleDrawer(false)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800/50 text-slate-300 text-left">
+            <i class="far fa-id-card text-sky-400 w-5"></i> KYC Verification
+          </button>
+          <button onclick="openPage('profile'); toggleDrawer(false)" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800/50 text-slate-300 text-left">
+            <i class="far fa-user text-indigo-400 w-5"></i> Profile
+          </button>
+          <a href="https://t.me/E_WALLET_Support_Team" target="_blank" rel="noopener noreferrer"
+            class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800/50 text-sky-400 text-left">
+            <i class="fab fa-telegram w-5"></i> Support (@E_WALLET_Support_Team)
+          </a>
+        </nav>
+      </div>
+      <button onclick="logoutUser()" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 text-sm font-semibold text-left">
+        <i class="fas fa-sign-out-alt w-5"></i> Logout
+      </button>
+    </aside>
+        <!-- ==================== 1. HOME PAGE ==================== -->
+    <section id="page-home" class="page-view hidden p-4 space-y-4">
+      <div class="balance-box p-5 shadow-xl">
+        <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">TOTAL WITHDRAWABLE BALANCE</p>
+        <div class="flex items-center justify-between mt-2">
+          <h2 id="homeTotalBalance" class="text-3xl font-extrabold text-white">৳0.00</h2>
+          <button onclick="openPage('deposit')" class="w-11 h-11 rounded-2xl cyan-grad flex items-center justify-center text-xl font-bold shadow-lg">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+        <p id="homeBalanceBreakdown" class="text-xs text-emerald-400 mt-2">(মূল ব্যালেন্স: ৳0.00 + কমিশন: ৳0.00)</p>
+      </div>
+
+      <div class="grid grid-cols-5 gap-2 text-center pt-1">
+        <button onclick="openPage('deposit')" class="flex flex-col items-center gap-1.5">
+          <div class="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/30 text-purple-400 flex items-center justify-center text-lg">
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <span class="text-[11px] text-slate-300">Deposit</span>
+        </button>
+
+        <button onclick="openPage('withdraw')" class="flex flex-col items-center gap-1.5">
+          <div class="w-12 h-12 rounded-2xl bg-rose-600/20 border border-rose-500/30 text-rose-400 flex items-center justify-center text-lg">
+            <i class="fas fa-arrow-down"></i>
+          </div>
+          <span class="text-[11px] text-slate-300">Withdraw</span>
+        </button>
+
+        <button onclick="openPage('gateway')" class="flex flex-col items-center gap-1.5">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg">
+            <i class="fas fa-wallet"></i>
+          </div>
+          <span class="text-[11px] text-slate-300">Gateway</span>
+        </button>
+
+        <button onclick="openPage('vip')" class="flex flex-col items-center gap-1.5">
+          <div class="w-12 h-12 rounded-2xl bg-amber-600/20 border border-amber-500/30 text-amber-400 flex items-center justify-center text-lg">
+            <i class="fas fa-users"></i>
+          </div>
+          <span class="text-[11px] text-slate-300">Users</span>
+        </button>
+
+        <button onclick="toast('1X Partner Portal Ready')" class="flex flex-col items-center gap-1.5">
+          <div class="w-12 h-12 rounded-2xl bg-sky-600/20 border border-sky-500/30 text-sky-400 flex items-center justify-center font-black text-xs">
+            1X
+          </div>
+          <span class="text-[11px] text-slate-300">1X</span>
+        </button>
+
+        <a href="https://dkwin9.com/#/register?invitationCode=17723704988" target="_blank" rel="noopener noreferrer"
+          class="flex flex-col items-center gap-1.5 mt-1">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-center justify-center font-extrabold text-[10px]">
+            DKWIN
+          </div>
+          <span class="text-[11px] text-slate-300">DKWIN</span>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="card-box p-4">
+          <p class="text-xs text-slate-400">Total Deposit</p>
+          <p id="statDeposit" class="text-lg font-extrabold text-cyan-400 mt-1">৳0.00</p>
+        </div>
+        <div class="card-box p-4">
+          <p class="text-xs text-slate-400">Total Withdraw</p>
+          <p id="statWithdraw" class="text-lg font-extrabold text-rose-400 mt-1">৳0.00</p>
+        </div>
+        <div class="card-box p-4">
+          <p class="text-xs text-slate-400">Today Commission</p>
+          <p id="statTodayComm" class="text-lg font-extrabold text-emerald-400 mt-1">৳0.00</p>
+        </div>
+        <div class="card-box p-4">
+          <p class="text-xs text-slate-400">Total Commission</p>
+          <p id="statTotalComm" class="text-lg font-extrabold text-pink-400 mt-1">৳0.00</p>
+        </div>
+      </div>
+
+      <div class="card-box p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-bold text-sm text-white">Recent Transactions</h3>
+          <button onclick="openPage('transactions')" class="text-xs text-cyan-400 font-semibold">View All</button>
+        </div>
+        <div id="homeTxList" class="space-y-3"></div>
+      </div>
+    </section>
+        <!-- ==================== 2. DEPOSIT PAGE ==================== -->
+    <section id="page-deposit" class="page-view hidden p-4 space-y-4">
+      <div class="flex items-center gap-3">
+        <button onclick="openPage('home')" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs text-cyan-400 font-semibold">← ব্যাক</button>
+        <h2 class="text-lg font-bold text-white">জমা দিন (Deposit)</h2>
+      </div>
+
+      <div id="depStep1" class="card-box p-5 space-y-4">
+        <p class="text-xs text-cyan-400 font-semibold">● পেমেন্ট মেথড নির্বাচন করুন</p>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" data-method="bKash" onclick="pickDepMethod('bKash')"
+            class="dep-m-btn p-3 rounded-xl border-2 border-cyan-400 bg-slate-900 font-extrabold text-pink-500 text-sm">বিকাশ</button>
+          <button type="button" data-method="Nagad" onclick="pickDepMethod('Nagad')"
+            class="dep-m-btn p-3 rounded-xl border border-slate-700 bg-slate-900 font-extrabold text-orange-500 text-sm">নগদ</button>
+          <button type="button" data-method="Binance" onclick="pickDepMethod('Binance')"
+            class="dep-m-btn p-3 rounded-xl border border-slate-700 bg-slate-900 font-extrabold text-yellow-400 text-sm">বাইনান্স</button>
+        </div>
+
+        <p class="text-xs text-cyan-400 font-semibold pt-1">● জমার পরিমাণ</p>
+        <div class="grid grid-cols-5 gap-1.5">
+          <button type="button" onclick="setDepAmt(1000)" class="py-2 rounded-lg bg-slate-800 hover:bg-cyan-500 hover:text-black text-xs font-bold">1,000</button>
+          <button type="button" onclick="setDepAmt(1200)" class="py-2 rounded-lg bg-slate-800 hover:bg-cyan-500 hover:text-black text-xs font-bold">1,200</button>
+          <button type="button" onclick="setDepAmt(3000)" class="py-2 rounded-lg bg-slate-800 hover:bg-cyan-500 hover:text-black text-xs font-bold">3,000</button>
+          <button type="button" onclick="setDepAmt(5000)" class="py-2 rounded-lg bg-slate-800 hover:bg-cyan-500 hover:text-black text-xs font-bold">5,000</button>
+          <button type="button" onclick="setDepAmt(10000)" class="py-2 rounded-lg bg-slate-800 hover:bg-cyan-500 hover:text-black text-xs font-bold">10,000</button>
+        </div>
+
+        <input id="depAmount" type="number" placeholder="৳ 1000 - 25,000"
+          class="w-full px-4 py-3.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold text-sm" />
+
+        <button type="button" onclick="goDepStep2()" class="w-full py-3.5 rounded-xl cyan-grad font-bold text-sm">
+          পরবর্তী →
+        </button>
+      </div>
+
+      <div id="depStep2" class="hidden card-box p-5 space-y-4">
+        <div class="text-center">
+          <h3 class="text-base font-bold text-cyan-400">টাকা সেন্ড মানি করুন</h3>
+          <p class="text-xs text-slate-400 mt-1">নিচের তথ্য কপি করে পেমেন্ট সম্পন্ন করুন এবং TrxID দিন</p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <p id="depChannelLabel" class="text-xs text-slate-400">বিকাশ সেন্ড মানি নাম্বার</p>
+            <p id="depChannelValue" class="text-lg font-extrabold text-white tracking-wider">01873046713</p>
+          </div>
+          <button type="button" onclick="copyCurrentChannel()" class="px-4 py-2 rounded-lg cyan-grad text-xs font-bold">কপি</button>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-700 rounded-xl p-3.5 flex items-center justify-between">
+          <span class="text-xs text-slate-400">ডিপোজিট পরিমাণ:</span>
+          <span id="depConfirmAmt" class="text-base font-extrabold text-cyan-400">৳1000.00</span>
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">ট্রানজেকশন আইডি (TrxID) দিন</label>
+          <input id="depTrx" type="text" placeholder="Example: 8N7X2..." autocomplete="off"
+            class="w-full px-4 py-3.5 rounded-xl bg-slate-900 border border-slate-700 text-white uppercase text-sm" />
+        </div>
+
+        <div class="flex gap-2">
+          <button type="button" onclick="backDepStep1()" class="w-1/3 py-3.5 rounded-xl bg-slate-800 text-xs font-bold">← পিছনে</button>
+          <button type="button" onclick="submitDepRequest()" class="w-2/3 py-3.5 rounded-xl cyan-grad font-bold text-sm">ডিপোজিট নিশ্চিত করুন</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. WITHDRAW PAGE ==================== -->
+    <section id="page-withdraw" class="page-view hidden p-4">
+      <div class="bg-white text-slate-900 rounded-3xl p-6 shadow-xl space-y-4">
+        <h2 class="text-xl font-extrabold text-center text-indigo-950">💰 Withdraw Money</h2>
+
+        <div class="bg-indigo-50 rounded-2xl p-4">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-600">Total Withdrawable:</span>
+            <span id="withTotalBal" class="text-base font-extrabold text-indigo-600">৳ 0.00</span>
+          </div>
+          <p id="withBreakdown" class="text-[11px] font-semibold text-emerald-700 mt-1">(মূল ব্যালেন্স: ৳0.00 + কমিশন: ৳0.00)</p>
+        </div>
+
+        <p class="text-xs font-bold text-rose-600">⚠️ সর্বনিম্ন উত্তোলনের পরিমাণ ৫,০০০ টাকা</p>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Withdrawal Method</label>
+          <select id="withMethod" class="w-full px-4 py-3 rounded-xl border border-slate-300 font-semibold text-sm bg-white">
+            <option value="bKash">বিকাশ (bKash)</option>
+            <option value="Nagad">নগদ (Nagad)</option>
+            <option value="Binance">বাইনান্স (Binance)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Account Number / Pay ID</label>
+          <input id="withAccount" type="text" placeholder="Enter account number or Pay ID" autocomplete="off"
+            class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Amount (৳)</label>
+          <input id="withAmount" type="number" placeholder="Enter amount (Min 5000)"
+            class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm" />
+        </div>
+
+        <button type="button" onclick="submitWithdrawRequest()"
+          class="w-full py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-lg">
+          Withdraw Now
+        </button>
+      </div>
+          </section>
+      <!-- ==================== 4. SECURE AGENT PANEL ==================== -->
+    <section id="page-gateway" class="page-view hidden p-4 space-y-4">
+      <button onclick="openPage('home')" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs text-cyan-400 font-semibold">← Dashboard</button>
+
+      <h2 class="text-lg font-extrabold text-cyan-400 flex items-center gap-2">
+        <i class="fas fa-shield-alt"></i> Secure Agent Panel
+      </h2>
+
+      <div class="card-box p-4 space-y-2 text-xs">
+        <p class="font-extrabold text-cyan-400 uppercase">পেমেন্ট ও সাপোর্ট তথ্য</p>
+        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl">
+          <span class="text-pink-400 font-bold">বিকাশ সেন্ড মানি:</span>
+          <button type="button" onclick="copyText('01873046713')" class="text-white font-extrabold">01873046713 <i class="far fa-copy text-cyan-400 ml-1"></i></button>
+        </div>
+        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl">
+          <span class="text-orange-400 font-bold">নগদ সেন্ড মানি:</span>
+          <button type="button" onclick="copyText('01863796311')" class="text-white font-extrabold">01863796311 <i class="far fa-copy text-cyan-400 ml-1"></i></button>
+        </div>
+        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl">
+          <span class="text-yellow-400 font-bold">বাইনান্স ID:</span>
+          <button type="button" onclick="copyText('1268820382')" class="text-white font-extrabold">1268820382 <i class="far fa-copy text-cyan-400 ml-1"></i></button>
+        </div>
+        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl">
+          <span class="text-sky-400 font-bold">টেলিগ্রাম সাপোর্ট:</span>
+          <a href="https://t.me/E_WALLET_Support_Team" target="_blank" rel="noopener noreferrer" class="text-cyan-300 font-extrabold">@E_WALLET_Support_Team</a>
+        </div>
+      </div>
+
+      <div class="card-box p-4 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-bold text-white">Auto Request Status</p>
+          <p id="autoStatusText" class="text-xs text-emerald-400 mt-0.5">● Active (সক্রিয় আছে)</p>
+        </div>
+        <input id="autoRequestToggle" type="checkbox" checked onchange="toggleAutoStatus()" class="w-6 h-6 accent-cyan-400 cursor-pointer" />
+      </div>
+
+      <div class="balance-box p-5 text-center">
+        <p class="text-xs text-slate-400">Available Main Balance</p>
+        <h3 id="agentMainBal" class="text-3xl font-extrabold text-white mt-1">৳0.00</h3>
+        <p id="agentCommBal" class="text-xs text-emerald-400 font-semibold mt-1">Agent Commission (20%): ৳0.00</p>
+        <p class="text-[11px] text-amber-400 mt-2">* Safety Reserve: Min 100 TK balance must remain in account</p>
+      </div>
+
+      <div class="card-box p-4 space-y-3">
+        <p class="text-xs font-extrabold text-cyan-400 uppercase">অ্যাকাউন্ট যুক্ত করুন (PAYMENT ACCOUNTS)</p>
+
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" onclick="openGatewayForm('বিকাশ')" class="p-3 rounded-xl bg-slate-900 border border-slate-700 text-center">
+            <p class="font-extrabold text-pink-500 text-xs">বিকাশ</p>
+            <p class="text-[10px] text-slate-400 mt-1">অ্যাকাউন্ট এড +</p>
+          </button>
+          <button type="button" onclick="openGatewayForm('নগদ')" class="p-3 rounded-xl bg-slate-900 border border-slate-700 text-center">
+            <p class="font-extrabold text-orange-500 text-xs">নগদ</p>
+            <p class="text-[10px] text-slate-400 mt-1">অ্যাকাউন্ট এড +</p>
+          </button>
+          <button type="button" onclick="openGatewayForm('বাইনান্স')" class="p-3 rounded-xl bg-slate-900 border border-slate-700 text-center">
+            <p class="font-extrabold text-yellow-400 text-xs">বাইনান্স</p>
+            <p class="text-[10px] text-slate-400 mt-1">অ্যাকাউন্ট এড +</p>
+          </button>
+        </div>
+
+        <div id="gatewayFormBox" class="hidden bg-slate-900 border border-cyan-500/40 rounded-xl p-4 space-y-3 mt-2">
+          <h4 class="text-sm font-bold text-cyan-400">Add <span id="gwFormName">বিকাশ</span> Account</h4>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">অ্যাকাউন্টের ধরন:</label>
+            <select id="gwType" class="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-sm text-white">
+              <option value="Personal">Personal</option>
+              <option value="Agent">Agent</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">নম্বর / ওয়ালেট আইডি:</label>
+            <input id="gwNumber" type="text" placeholder="নম্বর বা ওয়ালেট আইডি দিন" autocomplete="off"
+              class="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-sm text-white" />
+          </div>
+          <div class="flex gap-2">
+            <button type="button" onclick="saveGatewayAccount()" class="w-1/2 py-2.5 rounded-lg cyan-grad font-bold text-xs">Save Account</button>
+            <button type="button" onclick="document.getElementById('gatewayFormBox').classList.add('hidden')" class="w-1/2 py-2.5 rounded-lg bg-slate-700 text-xs font-semibold">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-box p-4 space-y-3">
+        <p class="text-xs font-extrabold text-cyan-400 uppercase">INCOMING DEPOSIT & WITHDRAWAL REQUESTS</p>
+        <div id="incomingRequestsList" class="space-y-3"></div>
+      </div>
+
+      <div class="card-box p-4 space-y-3">
+        <p class="text-xs font-extrabold text-cyan-400">আপনার সেট করা অ্যাকাউন্টসমূহ</p>
+        <div id="savedGatewaysList" class="space-y-2.5"></div>
+      </div>
+
+      <div class="card-box p-4 space-y-2">
+        <p class="text-xs font-extrabold text-cyan-400 uppercase">AUTO TRANSACTIONS HISTORY</p>
+        <div id="autoHistoryList" class="text-xs text-slate-400"></div>
+      </div>
+             <!-- ==================== 5. TRANSACTIONS PAGE ==================== -->
+    <section id="page-transactions" class="page-view hidden p-4 space-y-4">
+      <button onclick="openPage('home')" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs text-cyan-400 font-semibold">← Dashboard</button>
+      <div class="card-box p-4 space-y-3">
+        <h2 class="text-base font-bold text-white">Wallet Transactions</h2>
+        <div id="allTxList" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- ==================== 6. VIP TIER PAGE ==================== -->
+    <section id="page-vip" class="page-view hidden p-4 space-y-4">
+      <div class="card-box p-5 space-y-3">
+        <h3 class="text-base font-bold text-cyan-400">🔗 Your Referral Link</h3>
+        <p class="text-xs text-slate-400">Share this invitation link to connect partners and referrals.</p>
+        <div class="flex gap-2">
+          <input id="refLinkBox" type="text" readonly value="https://dkwin9.com/#/register?invitationCode=17723704988"
+            class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-300" />
+          <button type="button" onclick="copyText(document.getElementById('refLinkBox').value)" class="px-4 py-2 rounded-xl cyan-grad font-bold text-xs">Copy</button>
+        </div>
+        <a href="https://dkwin9.com/#/register?invitationCode=17723704988" target="_blank" rel="noopener noreferrer"
+          class="inline-block text-xs font-bold text-cyan-400 hover:underline pt-1">
+          Open DKWIN Portal →
+        </a>
+      </div>
+
+      <div class="card-box p-5 space-y-3">
+        <h3 class="text-base font-bold text-white">📊 Referral Statistics</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-slate-900 p-3.5 rounded-xl">
+            <p class="text-xs text-slate-400">Total Accounts</p>
+            <p class="text-lg font-extrabold text-cyan-400 mt-1">0 জন</p>
+          </div>
+          <div class="bg-slate-900 p-3.5 rounded-xl">
+            <p class="text-xs text-slate-400">Total Deposit</p>
+            <p class="text-lg font-extrabold text-emerald-400 mt-1">৳0.00</p>
+          </div>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-xl space-y-1.5 text-xs">
+          <p class="font-bold text-amber-400 mb-1">💰 Referral Commission (30%)</p>
+          <div class="flex justify-between"><span>Deposit Commission (30%):</span><span class="text-emerald-400 font-bold">৳0.00</span></div>
+          <div class="flex justify-between"><span>Withdraw Commission (30%):</span><span class="text-emerald-400 font-bold">৳0.00</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 7. KYC VERIFICATION PAGE ==================== -->
+    <section id="page-kyc" class="page-view hidden p-4">
+      <form onsubmit="submitKycDemo(event)" class="card-box p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-cyan-400">🪪 KYC Verification</h2>
+          <span id="kycBadge" class="text-[11px] px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 font-bold">NOT_SUBMITTED</span>
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">পুরো নাম (NID অনুযায়ী)</label>
+          <input id="kycName" type="text" required placeholder="আপনার পুরো নাম লিখুন" autocomplete="off"
+            class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white" />
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">NID নাম্বার</label>
+          <input id="kycNid" type="text" required placeholder="আপনার NID নাম্বার দিন" autocomplete="off"
+            class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white" />
+        </div>
+
+        <p class="text-xs text-amber-400">☀️ স্পষ্ট JPG, PNG বা WEBP ছবি আপলোড করুন।</p>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">NID Front (সামনের দিক)</label>
+          <input id="kycFrontInput" type="file" accept="image/*" class="w-full text-xs text-slate-300 bg-slate-900 p-2.5 rounded-xl border border-slate-700" />
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">NID Back (পেছনের দিক)</label>
+          <input id="kycBackInput" type="file" accept="image/*" class="w-full text-xs text-slate-300 bg-slate-900 p-2.5 rounded-xl border border-slate-700" />
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">আপনার ছবি (Selfie)</label>
+          <input id="kycSelfieInput" type="file" accept="image/*" class="w-full text-xs text-slate-300 bg-slate-900 p-2.5 rounded-xl border border-slate-700" />
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl cyan-grad font-bold text-sm">Submit KYC</button>
+      </form>
+    </section>
+
+    <!-- ==================== 8. PROFILE PAGE ==================== -->
+    <section id="page-profile" class="page-view hidden p-4 space-y-4">
+      <div class="card-box p-5 space-y-4">
+        <h2 class="text-lg font-bold text-cyan-400">👤 My Profile</h2>
+
+        <div class="bg-slate-900 p-4 rounded-2xl flex items-center gap-4">
+          <div id="profAvatar" class="w-14 h-14 rounded-full bg-cyan-400 text-slate-950 font-extrabold text-2xl flex items-center justify-center">U</div>
+          <div>
+            <h3 id="profDisplayName" class="font-bold text-base text-white">Wallet User</h3>
+            <p id="profDisplayId" class="text-xs text-slate-400">ID: -</p>
+            <div class="flex gap-2 mt-1.5">
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">ACTIVE</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-700 text-slate-300 font-bold">SILVER</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Full Name</label>
+          <input id="profInputName" type="text" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white" />
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">User ID</label>
+          <input id="profInputId" type="text" readonly class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-slate-400" />
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">New Password (optional)</label>
+          <input id="profInputPass" type="password" placeholder="Leave empty to keep current password"
+            class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white" />
+        </div>
+
+        <button type="button" onclick="saveProfileDemo()" class="w-full py-3.5 rounded-xl cyan-grad font-bold text-sm">Update Profile</button>
+      </div>
+
+      <div class="card-box p-5 space-y-2 text-xs">
+        <h3 class="text-sm font-bold text-cyan-400">📄 Saved Account Documents</h3>
+        <div id="profileDocsSummary" class="bg-slate-900 rounded-xl p-3.5 space-y-1 text-slate-300"></div>
+      </div>
+    </section>
+      </section>
+                <a href="https://t.me/E_WALLET_Support_Team" target="_blank" rel="noopener noreferrer"
+      class="fixed bottom-20 right-4 w-12 h-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-xl flex items-center justify-center text-xl z-30"
+      title="Telegram Support">
+      <i class="far fa-comment-dots"></i>
+      <span class="w-4 h-4 rounded-full bg-rose-600 text-[10px] font-bold flex items-center justify-center absolute -top-1 -right-1">1</span>
+    </a>
+
+    <nav class="fixed bottom-0 w-full max-w-[440px] bg-[#0c1019]/95 backdrop-blur border-t border-slate-800 flex justify-around py-2.5 text-[11px] text-slate-400 z-30">
+      <button onclick="openPage('home')" class="flex flex-col items-center text-cyan-400">
+        <i class="fas fa-home text-lg mb-1"></i>Home
+      </button>
+      <button onclick="openPage('vip')" class="flex flex-col items-center hover:text-cyan-400">
+        <i class="far fa-star text-lg mb-1"></i>VIP
+      </button>
+      <button onclick="openPage('deposit')" class="flex flex-col items-center hover:text-cyan-400">
+        <i class="far fa-plus-square text-lg mb-1"></i>Wallet
+      </button>
+      <button onclick="openPage('profile')" class="flex flex-col items-center hover:text-cyan-400">
+        <i class="far fa-user text-lg mb-1"></i>Account
+      </button>
+    </nav>
+  </div>
+
+  <div id="processingModal" class="hidden fixed inset-0 bg-[#070a10]/95 z-50 flex flex-col items-center justify-center p-6 text-center">
+    <div class="relative w-24 h-24 flex items-center justify-center mb-5">
+      <div class="w-24 h-24 rounded-full border-4 border-slate-800 border-t-cyan-400 ring-spin absolute inset-0"></div>
+      <span id="countdownNum" class="text-3xl font-extrabold text-cyan-400">15</span>
+    </div>
+    <h3 class="text-xl font-bold text-cyan-400">Processing Request...</h3>
+    <p class="text-xs text-slate-400 mt-2">আপনার অনুরোধটি প্রসেস করা হচ্ছে। অনুগ্রহ করে অপেক্ষা করুন।</p>
+  </div>
+
+  <div id="toastBox" class="hidden fixed top-16 left-1/2 -translate-x-1/2 bg-slate-900 border border-cyan-400/50 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-2xl z-50"></div>
+    <script>
+    const VAULT_KEY = 'ewallet_pro_vault_v3';
+    const SESSION_USER_KEY = 'ewallet_pro_session_v3';
+
+    const CHANNELS = {
+      bKash: { label: 'বিকাশ সেন্ড মানি নাম্বার', value: '01873046713', title: 'বিকাশ' },
+      Nagad: { label: 'নগদ সেন্ড মানি নাম্বার', value: '01863796311', title: 'নগদ' },
+      Binance: { label: 'বাইনান্স আইডি (Pay ID)', value: '1268820382', title: 'বাইনান্স' }
+    };
+
+    function createProfile(id, name, pass) {
+      return {
+        id,
+        name: name || 'Wallet User',
+        pass,
+        kyc: 'NOT_SUBMITTED',
+        docs: { nidName: '', nidNumber: '', files: [] },
+        mainBalance: 0,
+        commissionBalance: 0,
+        todayCommission: 0,
+        totalDeposit: 0,
+        totalWithdraw: 0,
+        autoStatus: true,
+        gateways: [],
+        transactions: []
+      };
+    }
+
+    function readVault() {
+      try { return JSON.parse(localStorage.getItem(VAULT_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function writeVault(data) {
+      localStorage.setItem(VAULT_KEY, JSON.stringify(data));
+    }
+
+    let vault = readVault();
+    let currentUserId = localStorage.getItem(SESSION_USER_KEY) || '';
+    let selectedMethod = 'bKash';
+
+    function getCurrentProfile() {
+      if (!currentUserId || !vault[currentUserId]) return null;
+      return vault[currentUserId];
+    }
+
+    function commitChanges() {
+      if (!currentUserId || !vault[currentUserId]) return;
+      writeVault(vault);
+      renderAll();
+    }
+
+    function fmt(n) {
+      return Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('toastBox');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => el.classList.add('hidden'), 2400);
+    }
+
+    function copyText(str) {
+      navigator.clipboard?.writeText(str);
+      toast('কপি হয়েছে: ' + str);
+    }
+
+    function setAuthMode(mode) {
+      const isLogin = mode === 'login';
+      document.getElementById('authHeading').textContent = isLogin ? 'Login' : 'Register';
+      document.getElementById('authSubHeading').textContent = isLogin
+        ? 'আপনার ইউজার আইডি ও পাসওয়ার্ড দিয়ে প্রবেশ করুন'
+        : 'নতুন অ্যাকাউন্ট তৈরি করুন';
+      document.getElementById('registerForm').classList.toggle('hidden', isLogin);
+      document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
+      document.getElementById('switchToLoginWrap').classList.toggle('hidden', isLogin);
+      document.getElementById('switchToRegWrap').classList.toggle('hidden', !isLogin);
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const id = document.getElementById('regUserId').value.trim();
+      const pass = document.getElementById('regPass').value.trim();
+      if (!id || pass.length < 6) return toast('সঠিক আইডি এবং কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দিন!');
+
+      vault = readVault();
+      if (vault[id]) return toast('এই ইউজার আইডি দিয়ে ইতিমধ্যে অ্যাকাউন্ট আছে! Login করুন।');
+
+      vault[id] = createProfile(id, name, pass);
+      currentUserId = id;
+      localStorage.setItem(SESSION_USER_KEY, id);
+      writeVault(vault);
+      e.target.reset();
+      showApp();
+      toast('অ্যাকাউন্ট তৈরি হয়েছে! ব্যালেন্স ও তথ্য সেভ থাকবে।');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const id = document.getElementById('loginUserId').value.trim();
+      const pass = document.getElementById('loginPass').value.trim();
+
+      vault = readVault();
+      const found = vault[id];
+      if (!found || found.pass !== pass) return toast('ইউজার আইডি অথবা পাসওয়ার্ড সঠিক নয়!');
+
+      currentUserId = id;
+      localStorage.setItem(SESSION_USER_KEY, id);
+      e.target.reset();
+      showApp();
+      toast('অ্যাকাউন্টের সকল তথ্য ও ব্যালেন্স লোড হয়েছে।');
+    }
+
+    function logoutUser() {
+      currentUserId = '';
+      localStorage.removeItem(SESSION_USER_KEY);
+      document.getElementById('appScreen').classList.add('hidden');
+      document.getElementById('authScreen').classList.remove('hidden');
+      setAuthMode('login');
+    }
+
+    function showApp() {
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('appScreen').classList.remove('hidden');
+      openPage('home');
+      renderAll();
+    }
+
+    function toggleDrawer(open) {
+      document.getElementById('sideDrawer').classList.toggle('-translate-x-full', !open);
+      document.getElementById('drawerBackdrop').classList.toggle('hidden', !open);
+    }
+
+    function openPage(name) {
+      document.querySelectorAll('.page-view').forEach(sec => sec.classList.add('hidden'));
+      const target = document.getElementById('page-' + name);
+      if (target) target.classList.remove('hidden');
+      if (name === 'deposit') backDepStep1();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function pickDepMethod(method) {
+      selectedMethod = method;
+      document.querySelectorAll('.dep-m-btn').forEach(btn => {
+        const active = btn.dataset.method === method;
+        btn.classList.toggle('border-2', active);
+        btn.classList.toggle('border-cyan-400', active);
+        btn.classList.toggle('border', !active);
+        btn.classList.toggle('border-slate-700', !active);
+      });
+    }
+
+    function setDepAmt(amount) {
+      document.getElementById('depAmount').value = amount;
+    }
+
+    function goDepStep2() {
+      const amt = parseFloat(document.getElementById('depAmount').value);
+      if (!amt || amt < 1000 || amt > 25000) return toast('১,০০০ থেকে ২৫,০০০ টাকার মধ্যে পরিমাণ দিন!');
+      const ch = CHANNELS[selectedMethod] || CHANNELS.bKash;
+      document.getElementById('depChannelLabel').textContent = ch.label;
+      document.getElementById('depChannelValue').textContent = ch.value;
+      document.getElementById('depConfirmAmt').textContent = '৳' + fmt(amt);
+      document.getElementById('depStep1').classList.add('hidden');
+      document.getElementById('depStep2').classList.remove('hidden');
+    }
+
+    function copyCurrentChannel() {
+      const ch = CHANNELS[selectedMethod] || CHANNELS.bKash;
+      copyText(ch.value);
+    }
+
+    function backDepStep1() {
+      document.getElementById('depStep2').classList.add('hidden');
+      document.getElementById('depStep1').classList.remove('hidden');
+    }
+
+    function submitDepRequest() {
+      const u = getCurrentProfile();
+      if (!u) return;
+      const amt = parseFloat(document.getElementById('depAmount').value);
+      const trx = document.getElementById('depTrx').value.trim().toUpperCase();
+      if (!trx) return toast('ট্রানজেকশন আইডি (TrxID) দিন!');
+
+      const ch = CHANNELS[selectedMethod] || CHANNELS.bKash;
+      u.transactions.unshift({
+        id: Date.now(),
+        kind: 'DEPOSIT',
+        method: selectedMethod,
+        amount: amt,
+        trxId: trx,
+        status: 'Pending',
+        title: `Deposit via ${ch.title} (TrxID: ${trx})`,
+        time: new Date().toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      });
+      commitChanges();
+
+      const modal = document.getElementById('processingModal');
+      const numEl = document.getElementById('countdownNum');
+      let sec = 15;
+      numEl.textContent = sec;
+      modal.classList.remove('hidden');
+
+      const iv = setInterval(() => {
+        sec -= 1;
+        if (sec <= 0) {
+          clearInterval(iv);
+          modal.classList.add('hidden');
+          document.getElementById('depTrx').value = '';
+          openPage('home');
+          toast('ডিপোজিট রিকোয়েস্ট যুক্ত হয়েছে! Gateway থেকে Approve করুন।');
+        } else {
+          numEl.textContent = sec;
+        }
+      }, 1000);
+    }
+
+    function submitWithdrawRequest() {
+      const u = getCurrentProfile();
+      if (!u) return;
+      const method = document.getElementById('withMethod').value;
+      const acc = document.getElementById('withAccount').value.trim();
+      const amt = parseFloat(document.getElementById('withAmount').value);
+
+      if (!acc) return toast('Account Number / Pay ID দিন!');
+      if (!amt || amt < 5000) return toast('সর্বনিম্ন উত্তোলনের পরিমাণ ৫,০০০ টাকা!');
+
+      u.transactions.unshift({
+        id: Date.now(),
+        kind: 'WITHDRAW',
+        method,
+        amount: amt,
+        account: acc,
+        status: 'Pending',
+        title: `Withdrawal Request via ${method}`,
+        time: new Date().toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      });
+
+      document.getElementById('withAccount').value = '';
+      document.getElementById('withAmount').value = '';
+      commitChanges();
+      openPage('home');
+      toast('উইথড্র রিকোয়েস্ট সাবমিট হয়েছে!');
+    }
+          function toggleAutoStatus() {
+      const u = getCurrentProfile();
+      if (!u) return;
+      u.autoStatus = document.getElementById('autoRequestToggle').checked;
+      commitChanges();
+    }
+
+    function openGatewayForm(gw) {
+      document.getElementById('gwFormName').textContent = gw;
+      document.getElementById('gatewayFormBox').classList.remove('hidden');
+    }
+
+    function saveGatewayAccount() {
+      const u = getCurrentProfile();
+      if (!u) return;
+      const gw = document.getElementById('gwFormName').textContent;
+      const type = document.getElementById('gwType').value;
+      const num = document.getElementById('gwNumber').value.trim();
+      if (!num) return toast('নম্বর বা ওয়ালেট আইডি দিন!');
+
+      u.gateways.unshift({ id: Date.now(), gateway: gw, type, number: num, active: true });
+      document.getElementById('gatewayFormBox').classList.add('hidden');
+      document.getElementById('gwNumber').value = '';
+      commitChanges();
+      toast(`${gw} অ্যাকাউন্ট সেভ হয়েছে!`);
+    }
+
+    function toggleGatewayItem(id) {
+      const u = getCurrentProfile();
+      if (!u) return;
+      const item = u.gateways.find(g => g.id === id);
+      if (item) item.active = !item.active;
+      commitChanges();
+    }
+
+    function deleteGatewayItem(id) {
+      const u = getCurrentProfile();
+      if (!u) return;
+      u.gateways = u.gateways.filter(g => g.id !== id);
+      commitChanges();
+    }
+
+    function approveTx(id) {
+      const u = getCurrentProfile();
+      if (!u) return;
+      const tx = u.transactions.find(t => t.id === id);
+      if (!tx || tx.status !== 'Pending') return;
+
+      const comm = tx.amount * 0.20;
+      tx.status = 'Approved';
+      u.commissionBalance += comm;
+      u.todayCommission += comm;
+
+      if (tx.kind === 'DEPOSIT') {
+        u.mainBalance += tx.amount;
+        u.totalDeposit += tx.amount;
+        tx.title = `${tx.title} [Deposit Verified & Approved]`;
+      } else {
+        u.mainBalance -= tx.amount;
+        u.totalWithdraw += tx.amount;
+        tx.title = `${tx.title} [Withdrawal Paid & Approved]`;
+      }
+
+      commitChanges();
+      toast(`Approved! ২০% কমিশন ৳${fmt(comm)} যোগ হয়েছে।`);
+    }
+
+    function submitKycDemo(e) {
+      e.preventDefault();
+      const u = getCurrentProfile();
+      if (!u) return;
+      const files = [
+        document.getElementById('kycFrontInput').files[0]?.name,
+        document.getElementById('kycBackInput').files[0]?.name,
+        document.getElementById('kycSelfieInput').files[0]?.name
+      ].filter(Boolean);
+
+      u.kyc = 'PENDING';
+      u.docs = {
+        nidName: document.getElementById('kycName').value.trim(),
+        nidNumber: document.getElementById('kycNid').value.trim(),
+        files
+      };
+      commitChanges();
+      toast('KYC ডকুমেন্টস এই অ্যাকাউন্টে সেভ হয়েছে!');
+    }
+
+    function saveProfileDemo() {
+      const u = getCurrentProfile();
+      if (!u) return;
+      u.name = document.getElementById('profInputName').value.trim() || u.name;
+      const nextPass = document.getElementById('profInputPass').value.trim();
+      if (nextPass) {
+        if (nextPass.length < 6) return toast('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে!');
+        u.pass = nextPass;
+        document.getElementById('profInputPass').value = '';
+      }
+      commitChanges();
+      toast('প্রোফাইল আপডেট হয়েছে!');
+    }
+
+    function renderAll() {
+      const u = getCurrentProfile();
+      if (!u) return;
+
+      const initial = (u.name || 'U').charAt(0).toUpperCase();
+      const withdrawable = u.mainBalance + u.commissionBalance;
+
+      document.getElementById('headerAvatar').textContent = initial;
+      document.getElementById('homeTotalBalance').textContent = '৳' + fmt(withdrawable);
+      document.getElementById('homeBalanceBreakdown').textContent = `(মূল ব্যালেন্স: ৳${fmt(u.mainBalance)} + কমিশন: ৳${fmt(u.commissionBalance)})`;
+
+      document.getElementById('statDeposit').textContent = '৳' + fmt(u.totalDeposit);
+      document.getElementById('statWithdraw').textContent = '৳' + fmt(u.totalWithdraw);
+      document.getElementById('statTodayComm').textContent = '৳' + fmt(u.todayCommission);
+      document.getElementById('statTotalComm').textContent = '৳' + fmt(u.commissionBalance);
+
+      document.getElementById('withTotalBal').textContent = '৳ ' + fmt(withdrawable);
+      document.getElementById('withBreakdown').textContent = `(মূল ব্যালেন্স: ৳${fmt(u.mainBalance)} + কমিশন: ৳${fmt(u.commissionBalance)})`;
+
+      document.getElementById('agentMainBal').textContent = '৳' + fmt(u.mainBalance);
+      document.getElementById('agentCommBal').textContent = `Agent Commission (20%): ৳${fmt(u.commissionBalance)}`;
+
+      const autoEl = document.getElementById('autoRequestToggle');
+      autoEl.checked = u.autoStatus;
+      document.getElementById('autoStatusText').textContent = u.autoStatus ? '● Active (সক্রিয় আছে)' : '● Inactive (বন্ধ আছে)';
+      document.getElementById('autoStatusText').className = u.autoStatus ? 'text-xs text-emerald-400 mt-0.5' : 'text-xs text-rose-400 mt-0.5';
+
+      document.getElementById('profAvatar').textContent = initial;
+      document.getElementById('profDisplayName').textContent = u.name;
+      document.getElementById('profDisplayId').textContent = `User ID: ${u.id}`;
+      document.getElementById('profInputName').value = u.name;
+      document.getElementById('profInputId').value = u.id;
+      document.getElementById('kycBadge').textContent = u.kyc;
+
+      const d = u.docs || {};
+      document.getElementById('profileDocsSummary').innerHTML = `
+        <p><span class="text-slate-400">KYC Status:</span> <strong class="text-amber-400">${u.kyc}</strong></p>
+        <p><span class="text-slate-400">NID Name:</span> <strong>${d.nidName || 'সেভ করা নেই'}</strong></p>
+        <p><span class="text-slate-400">NID Number:</span> <strong>${d.nidNumber || 'সেভ করা নেই'}</strong></p>
+        <p><span class="text-slate-400">Files:</span> <strong>${d.files && d.files.length ? d.files.join(', ') : 'কোনো ফাইল নেই'}</strong></p>
+      `;
+
+      const txRow = (t) => `
+        <div class="flex items-start justify-between gap-2 border-b border-slate-800/80 pb-3 last:border-none">
+          <div>
+            <p class="text-xs font-bold text-slate-100 leading-snug">${t.title}</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">${t.kind} • ${t.time}</p>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${t.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${t.status}</span>
+            <p class="text-xs font-extrabold mt-1 ${t.kind === 'DEPOSIT' ? 'text-emerald-400' : 'text-rose-400'}">
+              ${t.kind === 'DEPOSIT' ? '+' : '-'}৳${fmt(t.amount)}
+            </p>
+          </div>
+        </div>`;
+
+      const emptyBox = '<p class="text-center text-xs text-slate-500 py-5">কোনো লেনদেন পাওয়া যায়নি।</p>';
+      document.getElementById('homeTxList').innerHTML = u.transactions.length ? u.transactions.slice(0, 5).map(txRow).join('') : emptyBox;
+      document.getElementById('allTxList').innerHTML = u.transactions.length ? u.transactions.map(txRow).join('') : emptyBox;
+
+      const pending = u.transactions.filter(t => t.status === 'Pending');
+      document.getElementById('incomingRequestsList').innerHTML = pending.length
+        ? pending.map(p => `
+          <div class="bg-slate-900 border border-slate-700 rounded-xl p-3.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold ${p.kind === 'DEPOSIT' ? 'text-emerald-400' : 'text-rose-400'}">Type: ${p.kind} | ${p.method.toUpperCase()}</span>
+              <span class="text-sm font-extrabold text-cyan-400">Amount: ৳${fmt(p.amount)}</span>
+            </div>
+            <p class="text-xs text-slate-300">Description: ${p.title}</p>
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-xs text-amber-400 font-semibold">Status: Pending</span>
+              <button type="button" onclick="approveTx(${p.id})" class="px-3.5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs">
+                ✓ Confirm & Approve
+              </button>
+            </div>
+          </div>`).join('')
+        : '<p class="text-center text-xs text-slate-500 py-3">কোনো পেন্ডিং রিকোয়েস্ট নেই।</p>';
+
+      document.getElementById('savedGatewaysList').innerHTML = u.gateways.length
+        ? u.gateways.map(g => `
+          <div class="bg-slate-900 border border-slate-700 rounded-xl p-3 flex items-center justify-between gap-2">
+            <div>
+              <p class="text-xs font-bold text-white">Gateway: ${g.gateway} (${g.type})</p>
+              <p class="text-xs text-cyan-400 mt-0.5">Number/ID: ${g.number}</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="toggleGatewayItem(${g.id})" class="px-2.5 py-1 rounded text-[11px] font-bold ${g.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-300'}">
+                ${g.active ? 'Active' : 'Off'}
+              </button>
+              <button type="button" onclick="deleteGatewayItem(${g.id})" class="px-2.5 py-1 rounded bg-rose-500/20 text-rose-400 text-[11px] font-bold">
+                Delete
+              </button>
+            </div>
+          </div>`).join('')
+        : '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center text-xs text-slate-400">কোনো অ্যাকাউন্ট বা নম্বর সেভ করা নেই।</div>';
+
+      const approved = u.transactions.filter(t => t.status === 'Approved');
+      document.getElementById('autoHistoryList').innerHTML = approved.length
+        ? approved.map(a => `<div class="py-2 border-b border-slate-800/70 last:border-none flex justify-between"><span>${a.method} (${a.kind})</span><span class="text-emerald-400 font-bold">৳${fmt(a.amount)}</span></div>`).join('')
+        : '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center text-xs text-slate-400">কোনো অটো ট্রানজেকশন হিস্ট্রি নেই।</div>';
+    }
+
+    if (currentUserId && vault[currentUserId]) {
+      showApp();
+    } else {
+      setAuthMode('login');
+    }
+  </script>
+</body>
+</html>
+  
